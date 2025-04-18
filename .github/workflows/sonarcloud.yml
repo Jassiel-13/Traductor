@@ -1,0 +1,50 @@
+name: Build and analyze on SonarCloud
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - '*'
+
+jobs:
+  build:
+    name: Build and analyze on SonarCloud
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install dotnet reportgenerator global tool
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Run tests with coverage
+        run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+      - name: Convert coverage to lcov
+        run: |
+          reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coveragereport -reporttypes:lcov
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: jassiel-13_Traductor
+          SONAR_ORGANIZATION: jassiel-13
+          SONAR_SCANNER_OPTS: -Dsonar.cs.opencover.reportsPaths=coveragereport/lcov.info
