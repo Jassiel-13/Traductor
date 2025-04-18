@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  # Asegúrate de que sea la versión que usas
+          dotnet-version: '8.0.x'  # Cambia esto si usas otra versión
 
       - name: Restore dependencies
         run: dotnet restore
@@ -38,5 +38,5 @@ jobs:
           projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: TU_PROJECT_KEY
-          SONAR_ORGANIZATION: TU_ORGANIZATION
+          SONAR_PROJECT_KEY: jassiel-13_Traductor
+          SONAR_ORGANIZATION: jassiel-13
